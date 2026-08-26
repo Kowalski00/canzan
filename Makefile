@@ -1,5 +1,5 @@
 PROGRAM = canzan
-SRCS = main
+SRCS = main_r
 CC = gcc
 CFLAGS = -Wall -Wextra  -O2 `pkg-config --cflags gtk4`
 LIBS = `pkg-config --libs gtk4`
@@ -14,3 +14,6 @@ ${PROGRAM}: ${SRCS}.c
 
 clean:
 	rm ${PROGRAM} compile_commands.json
+
+resources:
+	glib-compile-resources src/canzan.gresource.xml --target=resources.c --generate-source
