@@ -1,6 +1,6 @@
 #include "glib-object.h"
 #include <gtk/gtk.h>
-#include "resources.c"
+#include "src/resources.c"
 
 #define APP_PREFIX "/com/github/rkj/canzan/"
 

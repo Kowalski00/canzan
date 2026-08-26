@@ -15,5 +15,5 @@ ${PROGRAM}: ${SRCS}.c
 clean:
 	rm ${PROGRAM} compile_commands.json
 
-resources:
-	glib-compile-resources src/canzan.gresource.xml --target=resources.c --generate-source
+comprsc:
+	glib-compile-resources src/canzan.gresource.xml --target=src/resources.c --generate-source
