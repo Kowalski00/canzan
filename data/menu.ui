@@ -1,90 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-	<object class="GtkApplicationWindow" id="window">
-		<property name="title">C Anzan</property>
-		<property name="default-width">1280</property>
-		<property name="default-height">720</property>
-		<child>
-			<object class="GtkBox">
-				<property name="orientation">GTK_ORIENTATION_VERTICAL</property>
-				<child>
-					<object class="GtkBox">
-						<property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
-						<child>
-							<object class="GtkLabel">
-								<property name="width-chars">10</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkButton">
-								<property name="label">New</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkButton">
-								<property name="label">Open</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkLabel">
-								<property name="hexpand">TRUE</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkButton">
-								<property name="label">Save</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkButton">
-								<property name="label">Close</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkLabel">
-								<property name="width-chars">10</property>
-							</object>
-						</child>
-					</object>
-				</child>
-				<child>
-					<object class="GtkBox" id="numbersWindow">
-						<child>
-							<object class="GtkLabel">
-								<property name="label">file-2</property>
-							</object>
-						</child>
-					</object>
-				</child>
-				<child>
-					<object class="GtkBox">
-						<property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
-						<child>
-							<object class="GtkLabel">
-								<property name="width-chars">10</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkButton">
-								<property name="label">Play</property>
-							</object>
-						</child>
-						<child>
-							<object class="GtkEntry">
-								<attributes>
-									<attribute name="weight" value="PANGO_WEIGHT_BOLD"/>
-									<attribute name="background" value="red" start="5" end="10"/>
-								</attributes>
-							</object>
-						</child>
-						<child>
-							<object class="GtkButton">
-								<property name="label">Repeat</property>
-							</object>
-						</child>
-					</object>
-				</child>
-			</object>
-		</child>
-	</object>
+	<menu id="menu">
+		<object class="GtkMenuButton" id="buttonmenu">
+			<property name="direction">none</property>
+			<property name="icon-name">view-more-symbolic</property>
+		</object>
+	</menu>
 </interface>

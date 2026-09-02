@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
 	<gresource prefix="/com/github/rkj/canzan">
-    <file>menu.ui</file>
+    	<file>canzan.ui</file>
+		<file alias="data/menu.ui">menu.ui</file>
   </gresource>
 </gresources>
