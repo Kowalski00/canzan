@@ -16,7 +16,7 @@ static void activate(GtkApplication *app, gpointer user_data)
 	GtkBuilder *build;
 	GtkWidget *window;
 
-	build = gtk_builder_new_from_resource(APP_PREFIX "menu.ui");
+	build = gtk_builder_new_from_resource(APP_PREFIX"menu.ui");
 	window = GTK_WIDGET(gtk_builder_get_object(build, "window"));
 	gtk_window_set_application(GTK_WINDOW(window), GTK_APPLICATION(app));
 
