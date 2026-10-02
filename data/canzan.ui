@@ -8,6 +8,9 @@
 			<object class="GtkBox">
 				<property name="orientation">GTK_ORIENTATION_VERTICAL</property>
 				<child>
+					<object class="GtkPopoverMenuBar" id="menuBar"></object>
+				</child>
+				<child>
 					<object class="GtkBox" id="numbersWindow">
 						<child>
 							<object class="GtkLabel">
