@@ -12,6 +12,10 @@
 					<attribute name="label">Settings</attribute>
 					<attribute name="action">win.openSettings</attribute>
 				</item>
+				<item>
+					<attribute name="label">Quit</attribute>
+					<attribute name="action">app.quit</attribute>
+				</item>
 			</section>
 		</submenu>
 	</menu>

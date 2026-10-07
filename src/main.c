@@ -16,6 +16,32 @@ static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gp
 	g_print("[*] Testing openSettingsActivated calling");
 }
 
+static void quitActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	GApplication *app = G_APPLICATION(user_data);
+	g_application_quit(app);
+
+}
+
+static void createActions(GtkWidget *window)
+{
+	const GActionEntry window_entries[] = {
+		{ "openHistory", openHistoryActivated, NULL, NULL, NULL, {0,0,0}}	
+		, { "openSettings", openSettingsActivated, NULL, NULL, NULL, {0,0,0}}	
+	};
+
+	g_action_map_add_action_entries(G_ACTION_MAP(window), window_entries, G_N_ELEMENTS(window_entries), window);
+}
+
+static void createAppActions(GtkApplication *app)
+{
+	const GActionEntry window_entries[] = {
+		{ "quit", quitActivated, NULL, NULL, NULL, {0,0,0}}	
+	};
+
+	g_action_map_add_action_entries(G_ACTION_MAP(app), window_entries, G_N_ELEMENTS(window_entries), app);
+}
+
 static void activate(GtkApplication *app, gpointer user_data)
 {
 	GtkBuilder *build;
@@ -38,18 +64,18 @@ static void activate(GtkApplication *app, gpointer user_data)
 	} else {
 		g_printerr("[*] WARNING: Could not find menu object inside menu.ui");
 	}
-
-	const GActionEntry window_entries[] = {
-		{ "openHistory", openHistoryActivated, NULL, NULL, NULL}	
-		, { "openSettings", openSettingsActivated, NULL, NULL, NULL}	
-	};
-
-	g_action_map_add_action_entries(G_ACTION_MAP(window), window_entries, G_N_ELEMENTS(window_entries), window);
+	
+	createActions(window);
 
 	gtk_window_present(GTK_WINDOW (window));
 
 	g_object_unref(menuBuild);
 	g_object_unref(build);
+}
+
+static void startup(GtkApplication *app, gpointer user_data)
+{
+	createAppActions(app);
 }
 
 int main(int argc, char **argv)
@@ -58,6 +84,7 @@ int main(int argc, char **argv)
 	int status;
 
 	app = gtk_application_new("org.rkj.anzan", G_APPLICATION_DEFAULT_FLAGS);
+	g_signal_connect(app, "startup", G_CALLBACK(startup), NULL);
 	g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
 
 	status = g_application_run(G_APPLICATION(app), argc, argv);
