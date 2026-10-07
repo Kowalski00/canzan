@@ -31,6 +31,12 @@ static void quitActivated(GSimpleAction *action, GVariant *parameter, gpointer u
 
 }
 
+static gboolean closeWindow(GtkWindow *window, gpointer user_data)
+{
+	g_application_quit(G_APPLICATION(user_data));
+	return TRUE;
+}
+
 static void createActions(GtkWidget *window)
 {
 	const GActionEntry window_entries[] = {
@@ -60,6 +66,8 @@ static void activate(GtkApplication *app, gpointer user_data)
 
 	build = gtk_builder_new_from_resource(APP_PREFIX"data/canzan.ui");
 	window = GTK_WIDGET(gtk_builder_get_object(build, "window"));
+
+	g_signal_connect(window, "close-request", G_CALLBACK(closeWindow), app);
 	gtk_window_set_application(GTK_WINDOW(window), GTK_APPLICATION(app));
 
 	menuBuild = gtk_builder_new_from_resource(APP_PREFIX"data/menu.ui");
