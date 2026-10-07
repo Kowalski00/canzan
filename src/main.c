@@ -37,14 +37,14 @@ static gboolean closeWindow(GtkWindow *window, gpointer user_data)
 	return TRUE;
 }
 
-static void createActions(GtkWidget *window)
+static void createActions(GtkWidget *mainWindow)
 {
 	const GActionEntry window_entries[] = {
 		{ "openHistory", openHistoryActivated, NULL, NULL, NULL, {0,0,0}}	
 		, { "openSettings", openSettingsActivated, NULL, NULL, NULL, {0,0,0}}	
 	};
 
-	g_action_map_add_action_entries(G_ACTION_MAP(window), window_entries, G_N_ELEMENTS(window_entries), window);
+	g_action_map_add_action_entries(G_ACTION_MAP(mainWindow), window_entries, G_N_ELEMENTS(window_entries), mainWindow);
 }
 
 static void createAppActions(GtkApplication *app)
@@ -60,15 +60,15 @@ static void activate(GtkApplication *app, gpointer user_data)
 {
 	GtkBuilder *build;
 	GtkBuilder *menuBuild;
-	GtkWidget *window;
+	GtkWidget *mainWindow;
 	GMenuModel *menu;
 	GtkWidget *menuBar;
 
 	build = gtk_builder_new_from_resource(APP_PREFIX"data/canzan.ui");
-	window = GTK_WIDGET(gtk_builder_get_object(build, "window"));
+	mainWindow = GTK_WIDGET(gtk_builder_get_object(build, "window"));
 
-	g_signal_connect(window, "close-request", G_CALLBACK(closeWindow), app);
-	gtk_window_set_application(GTK_WINDOW(window), GTK_APPLICATION(app));
+	g_signal_connect(mainWindow, "close-request", G_CALLBACK(closeWindow), app);
+	gtk_window_set_application(GTK_WINDOW(mainWindow), GTK_APPLICATION(app));
 
 	menuBuild = gtk_builder_new_from_resource(APP_PREFIX"data/menu.ui");
 
@@ -81,9 +81,9 @@ static void activate(GtkApplication *app, gpointer user_data)
 		g_printerr("[*] WARNING: Could not find menu object inside menu.ui");
 	}
 	
-	createActions(window);
+	createActions(mainWindow);
 
-	gtk_window_present(GTK_WINDOW (window));
+	gtk_window_present(GTK_WINDOW(mainWindow));
 
 	g_object_unref(menuBuild);
 	g_object_unref(build);
