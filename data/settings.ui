@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<object class="GtkApplicationWindow" id="settingsWindow">
+		<property name="title">Settings</property>
+		<property name="default-width">640</property>
+		<property name="default-height">480</property>
+		<child>
+			<object class="GtkBox">
+				<property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+				<child>
+					<object class="GtkBox" id="settingsWindowBox">
+						<child>
+							<object class="GtkLabel">
+								<property name="label">TESTING</property>
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
+		</child>
+	</object>
+</interface>

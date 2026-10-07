@@ -13,7 +13,15 @@ static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpo
 
 static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[*] Testing openSettingsActivated calling");
+	g_print("[*] Testing openSettingsActivated calling\n");
+	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/settings.ui");
+	GtkWidget *settingsWindow = GTK_WIDGET(gtk_builder_get_object(build, "settingsWindow"));
+
+	GtkApplication *app = gtk_window_get_application(GTK_WINDOW(user_data));
+
+	gtk_window_set_application(GTK_WINDOW(settingsWindow), GTK_APPLICATION(app));
+
+	gtk_window_present(GTK_WINDOW(settingsWindow));
 }
 
 static void quitActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
