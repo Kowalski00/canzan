@@ -8,10 +8,21 @@
 			<object class="GtkBox">
 				<property name="orientation">GTK_ORIENTATION_VERTICAL</property>
 				<child>
-					<object class="GtkBox" id="settingsWindowBox">
+					<object class="GtkBox" id="numbersBox">
+					<property name="orientation">GTK_ORIENTATION_VERTICAL</property>
 						<child>
 							<object class="GtkLabel">
-								<property name="label">TESTING</property>
+								<property name="label">Numbers</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkLabel">
+								<property name="label">Digits</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkLabel">
+								<property name="label">Rows</property>
 							</object>
 						</child>
 					</object>

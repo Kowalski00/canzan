@@ -8,12 +8,18 @@
 
 static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[*] Testing openHistoryActivated calling");
+	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/history.ui");
+	GtkWidget *historyWindow = GTK_WIDGET(gtk_builder_get_object(build, "historyWindow"));
+
+	GtkApplication *app = gtk_window_get_application(GTK_WINDOW(user_data));
+
+	gtk_window_set_application(GTK_WINDOW(historyWindow), GTK_APPLICATION(app));
+
+	gtk_window_present(GTK_WINDOW(historyWindow));
 }
 
 static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	g_print("[*] Testing openSettingsActivated calling\n");
 	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/settings.ui");
 	GtkWidget *settingsWindow = GTK_WIDGET(gtk_builder_get_object(build, "settingsWindow"));
 
