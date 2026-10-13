@@ -21,6 +21,8 @@ static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpo
 static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/settings.ui");
+	GtkSpinButton *spinButtonDigits = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "digitsSpinButton"));
+	GtkSpinButton *spinButtonRows = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "rowsSpinButton"));
 	GtkWidget *settingsWindow = GTK_WIDGET(gtk_builder_get_object(build, "settingsWindow"));
 
 	GtkApplication *app = gtk_window_get_application(GTK_WINDOW(user_data));
@@ -28,6 +30,9 @@ static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gp
 	gtk_window_set_application(GTK_WINDOW(settingsWindow), GTK_APPLICATION(app));
 
 	gtk_window_present(GTK_WINDOW(settingsWindow));
+
+	int value = gtk_spin_button_get_value_as_int(spinButtonDigits);
+	g_print("value: %d/n", value);
 }
 
 static void quitActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
