@@ -6,6 +6,31 @@
 
 #define APP_PREFIX "/com/github/rkj/canzan/"
 
+static int digits = 0;
+static int rows = 0;
+
+static void handleRepeatButton(GtkButton *button, gpointer user_data)
+{
+	g_print("Repeat button clicked!\n");
+}
+
+static void handlePlayButton(GtkButton *button, gpointer user_data)
+{
+	g_print("Play button clicked! Digits: %d Rows: %d\n", digits, rows);
+}
+
+static void handleDigitsSpinButton(GtkSpinButton *button, gpointer user_data)
+{
+	digits = gtk_spin_button_get_value_as_int(button);
+	g_print("Digits button value: %d\n", digits);
+}
+
+static void handleRowsSpinButton(GtkSpinButton *button, gpointer user_data)
+{
+	rows = gtk_spin_button_get_value_as_int(button);
+	g_print("Rows button value: %d\n", rows);
+}
+
 static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/history.ui");
@@ -21,8 +46,8 @@ static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpo
 static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/settings.ui");
-	GtkSpinButton *spinButtonDigits = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "digitsSpinButton"));
-	GtkSpinButton *spinButtonRows = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "rowsSpinButton"));
+	GtkSpinButton *digitsSpinButton = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "digitsSpinButton"));
+	GtkSpinButton *rowsSpinButton = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "rowsSpinButton"));
 	GtkWidget *settingsWindow = GTK_WIDGET(gtk_builder_get_object(build, "settingsWindow"));
 
 	GtkApplication *app = gtk_window_get_application(GTK_WINDOW(user_data));
@@ -31,8 +56,8 @@ static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gp
 
 	gtk_window_present(GTK_WINDOW(settingsWindow));
 
-	int value = gtk_spin_button_get_value_as_int(spinButtonDigits);
-	g_print("value: %d/n", value);
+	g_signal_connect(digitsSpinButton, "value-changed", G_CALLBACK(handleDigitsSpinButton), NULL);
+	g_signal_connect(rowsSpinButton, "value-changed", G_CALLBACK(handleRowsSpinButton), NULL);
 }
 
 static void quitActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -46,6 +71,28 @@ static gboolean closeWindow(GtkWindow *window, gpointer user_data)
 {
 	g_application_quit(G_APPLICATION(user_data));
 	return TRUE;
+}
+
+static void connectMainWindowButtons(GtkBuilder *build)
+{
+	GtkButton *playButton;
+	GtkButton *repeatButton;
+
+	playButton = GTK_BUTTON(gtk_builder_get_object(build, "playButton"));
+	repeatButton = GTK_BUTTON(gtk_builder_get_object(build, "repeatButton"));
+
+	if(playButton == NULL) {
+		g_printerr("[*] ERROR: Could not find play button object inside canzan.ui");
+	}
+	
+	if(repeatButton == NULL) {
+		g_printerr("[*] ERROR: Could not find repeat button object inside canzan.ui");
+	}
+
+	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), NULL);
+	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), NULL);
+
+
 }
 
 static void createActions(GtkWidget *mainWindow)
@@ -89,8 +136,10 @@ static void activate(GtkApplication *app, gpointer user_data)
 	if(menu != NULL && menuBar != NULL) {
 		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menuBar), menu);
 	} else {
-		g_printerr("[*] WARNING: Could not find menu object inside menu.ui");
+		g_printerr("[*] ERROR: Could not find menu object inside menu.ui");
 	}
+
+	connectMainWindowButtons(build);
 	
 	createActions(mainWindow);
 
