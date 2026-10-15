@@ -6,8 +6,10 @@
 
 #define APP_PREFIX "/com/github/rkj/canzan/"
 
-static int digits = 0;
-static int rows = 0;
+static double digits = 1;
+static double rows = 2;
+
+static GtkLabel *mainNumberDisplay;
 
 static void handleRepeatButton(GtkButton *button, gpointer user_data)
 {
@@ -16,19 +18,21 @@ static void handleRepeatButton(GtkButton *button, gpointer user_data)
 
 static void handlePlayButton(GtkButton *button, gpointer user_data)
 {
-	g_print("Play button clicked! Digits: %d Rows: %d\n", digits, rows);
+	g_print("Play button clicked! Digits: %f Rows: %f\n", digits, rows);
+	int randomNumber = (rand() % (int) digits);
+	gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "298");
 }
 
 static void handleDigitsSpinButton(GtkSpinButton *button, gpointer user_data)
 {
 	digits = gtk_spin_button_get_value_as_int(button);
-	g_print("Digits button value: %d\n", digits);
+	g_print("Digits button value: %f\n", digits);
 }
 
 static void handleRowsSpinButton(GtkSpinButton *button, gpointer user_data)
 {
 	rows = gtk_spin_button_get_value_as_int(button);
-	g_print("Rows button value: %d\n", rows);
+	g_print("Rows button value: %f\n", rows);
 }
 
 static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -58,6 +62,11 @@ static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gp
 
 	g_signal_connect(digitsSpinButton, "value-changed", G_CALLBACK(handleDigitsSpinButton), NULL);
 	g_signal_connect(rowsSpinButton, "value-changed", G_CALLBACK(handleRowsSpinButton), NULL);
+
+	gtk_spin_button_set_value(digitsSpinButton, digits);
+	gtk_spin_button_set_value(rowsSpinButton, rows);
+
+
 }
 
 static void quitActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -73,13 +82,14 @@ static gboolean closeWindow(GtkWindow *window, gpointer user_data)
 	return TRUE;
 }
 
-static void connectMainWindowButtons(GtkBuilder *build)
+static void connectMainWindowSignals(GtkBuilder *build)
 {
 	GtkButton *playButton;
 	GtkButton *repeatButton;
 
 	playButton = GTK_BUTTON(gtk_builder_get_object(build, "playButton"));
 	repeatButton = GTK_BUTTON(gtk_builder_get_object(build, "repeatButton"));
+	mainNumberDisplay = GTK_LABEL(gtk_builder_get_object(build, "mainDisplayNumbers"));
 
 	if(playButton == NULL) {
 		g_printerr("[*] ERROR: Could not find play button object inside canzan.ui");
@@ -89,10 +99,12 @@ static void connectMainWindowButtons(GtkBuilder *build)
 		g_printerr("[*] ERROR: Could not find repeat button object inside canzan.ui");
 	}
 
+	if(mainNumberDisplay == NULL) {
+		g_printerr("[*] ERROR: Could not find repeat button object inside canzan.ui");
+	}
+
 	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), NULL);
 	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), NULL);
-
-
 }
 
 static void createActions(GtkWidget *mainWindow)
@@ -139,7 +151,7 @@ static void activate(GtkApplication *app, gpointer user_data)
 		g_printerr("[*] ERROR: Could not find menu object inside menu.ui");
 	}
 
-	connectMainWindowButtons(build);
+	connectMainWindowSignals(build);
 	
 	createActions(mainWindow);
 

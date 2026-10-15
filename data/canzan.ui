@@ -14,7 +14,7 @@
 					<object class="GtkBox" id="numbersWindow">
 						<child>
 							<object class="GtkLabel" id="mainDisplayNumbers">
-								<property name="label">file-2</property>
+								<property name="label"></property>
 							</object>
 						</child>
 					</object>
