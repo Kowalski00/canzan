@@ -13,7 +13,7 @@
 				<child>
 					<object class="GtkBox" id="numbersWindow">
 						<child>
-							<object class="GtkLabel">
+							<object class="GtkLabel" id="mainDisplayNumbers">
 								<property name="label">file-2</property>
 							</object>
 						</child>
@@ -28,7 +28,7 @@
 							</object>
 						</child>
 						<child>
-							<object class="GtkButton">
+							<object class="GtkButton" id="playButton">
 								<property name="label">Play</property>
 							</object>
 						</child>
@@ -41,7 +41,7 @@
 							</object>
 						</child>
 						<child>
-							<object class="GtkButton">
+							<object class="GtkButton" id="repeatButton">
 								<property name="label">Repeat</property>
 							</object>
 						</child>
