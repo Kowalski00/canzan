@@ -3,6 +3,7 @@
 #include "glib.h"
 #include "glibconfig.h"
 #include <gtk/gtk.h>
+//#include <stdlib.h>
 
 #define APP_PREFIX "/com/github/rkj/canzan/"
 
@@ -16,10 +17,22 @@ static void handleRepeatButton(GtkButton *button, gpointer user_data)
 	g_print("Repeat button clicked!\n");
 }
 
+static int getPow(double digits)
+{
+	int result = 1;
+	for(int i = 0; i < digits; i++) {
+		result *= 10;	
+	}
+
+	return result;
+}
+
 static void handlePlayButton(GtkButton *button, gpointer user_data)
 {
 	g_print("Play button clicked! Digits: %f Rows: %f\n", digits, rows);
-	int randomNumber = (rand() % (int) digits);
+	int max = getPow(digits);
+	int min = getPow(digits - 1);
+	int randomNumber = min + (rand() % (max - min));
 	gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "298");
 }
 
