@@ -3,12 +3,14 @@
 #include "glib.h"
 #include "glibconfig.h"
 #include <gtk/gtk.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 
 #define APP_PREFIX "/com/github/rkj/canzan/"
 
 static double digits = 1;
 static double rows = 2;
+static int *currentNumbers;
+static int counter = 0;
 
 static GtkLabel *mainNumberDisplay;
 
@@ -27,25 +29,59 @@ static int getPow(double digits)
 	return result;
 }
 
-static void handlePlayButton(GtkButton *button, gpointer user_data)
+static int getRandomNumber()
 {
-	g_print("Play button clicked! Digits: %f Rows: %f\n", digits, rows);
+	if(digits == 0) return 0;
 	int max = getPow(digits);
 	int min = getPow(digits - 1);
 	int randomNumber = min + (rand() % (max - min));
-	gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "298");
+	return randomNumber;
+}
+
+static gboolean handleSettingNumberLabel(gpointer user_data)
+{
+	if(counter == rows) {
+		free(currentNumbers);
+		currentNumbers = NULL;
+		return FALSE;
+	}
+	int randomNumber = currentNumbers[counter];
+	int length = snprintf(NULL, 0, "%d", randomNumber);
+	char* stringNumber = malloc(length + 1);
+	snprintf(stringNumber, length + 1, "%d", randomNumber);
+
+	gtk_label_set_label(GTK_LABEL(mainNumberDisplay), stringNumber);
+
+	free(stringNumber);
+	counter++;
+	return true;
+}
+
+static void handlePlayButton(GtkButton *button, gpointer user_data)
+{
+	int randomNumber;
+	currentNumbers = (int *) malloc(rows * sizeof(int));
+	for(int i = 0; i < rows; i++) {
+		randomNumber = getRandomNumber();
+		currentNumbers[i] = randomNumber;
+	}
+	for(int i = 0; i < rows; i++) {
+		g_print(" %d ", currentNumbers[i]);
+	}
+	g_print(" \n ");
+	
+	counter=0;
+	guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
 
 static void handleDigitsSpinButton(GtkSpinButton *button, gpointer user_data)
 {
 	digits = gtk_spin_button_get_value_as_int(button);
-	g_print("Digits button value: %f\n", digits);
 }
 
 static void handleRowsSpinButton(GtkSpinButton *button, gpointer user_data)
 {
 	rows = gtk_spin_button_get_value_as_int(button);
-	g_print("Rows button value: %f\n", rows);
 }
 
 static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
@@ -118,6 +154,8 @@ static void connectMainWindowSignals(GtkBuilder *build)
 
 	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), NULL);
 	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), NULL);
+
+	currentNumbers = (int *) malloc(rows * sizeof(int));
 }
 
 static void createActions(GtkWidget *mainWindow)
