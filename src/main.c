@@ -10,14 +10,10 @@
 static double digits = 1;
 static double rows = 2;
 static int *currentNumbers;
+static int *pastNumbers;
 static int counter = 0;
 
 static GtkLabel *mainNumberDisplay;
-
-static void handleRepeatButton(GtkButton *button, gpointer user_data)
-{
-	g_print("Repeat button clicked!\n");
-}
 
 static int getPow(double digits)
 {
@@ -41,8 +37,12 @@ static int getRandomNumber()
 static gboolean handleSettingNumberLabel(gpointer user_data)
 {
 	if(counter == rows) {
+		pastNumbers = (int *) malloc(rows * sizeof(int));
+		pastNumbers = currentNumbers;
 		free(currentNumbers);
 		currentNumbers = NULL;
+		counter = 0;
+		gtk_widget_set_sensitive(GTK_WIDGET(user_data), TRUE);
 		return FALSE;
 	}
 	int randomNumber = currentNumbers[counter];
@@ -55,6 +55,11 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 	free(stringNumber);
 	counter++;
 	return true;
+}
+
+static void handleRepeatButton(GtkButton *button, gpointer user_data)
+{
+	guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
 
 static void handlePlayButton(GtkButton *button, gpointer user_data)
@@ -70,7 +75,8 @@ static void handlePlayButton(GtkButton *button, gpointer user_data)
 	}
 	g_print(" \n ");
 	
-	counter=0;
+	counter = 0;
+	gtk_widget_set_sensitive(GTK_WIDGET(user_data), FALSE);
 	guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
 
@@ -152,8 +158,8 @@ static void connectMainWindowSignals(GtkBuilder *build)
 		g_printerr("[*] ERROR: Could not find repeat button object inside canzan.ui");
 	}
 
-	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), NULL);
-	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), NULL);
+	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), playButton);
+	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), playButton);
 
 	currentNumbers = (int *) malloc(rows * sizeof(int));
 }
