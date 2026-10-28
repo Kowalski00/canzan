@@ -9,8 +9,8 @@
 
 static double digits = 1;
 static double rows = 2;
-static int *currentNumbers;
-static int *pastNumbers;
+static int *pCurrentNumbers;
+static int *pPastNumbers;
 static int counter = 0;
 
 static GtkLabel *mainNumberDisplay;
@@ -34,18 +34,26 @@ static int getRandomNumber()
 	return randomNumber;
 }
 
+static void copyArray(int *source, int *target, int size)
+{
+	for(int i = 0; i < size; i++) {
+		target[i] = source[i];
+	}	
+}
+
 static gboolean handleSettingNumberLabel(gpointer user_data)
 {
 	if(counter == rows) {
-		pastNumbers = (int *) malloc(rows * sizeof(int));
-		pastNumbers = currentNumbers;
-		free(currentNumbers);
-		currentNumbers = NULL;
+		pPastNumbers = (int *) malloc(rows * sizeof(int));
+		copyArray(pCurrentNumbers, pPastNumbers, rows);
+		free(pCurrentNumbers);
+		pCurrentNumbers = NULL;
 		counter = 0;
 		gtk_widget_set_sensitive(GTK_WIDGET(user_data), TRUE);
+		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
 		return FALSE;
 	}
-	int randomNumber = currentNumbers[counter];
+	int randomNumber = pCurrentNumbers[counter];
 	int length = snprintf(NULL, 0, "%d", randomNumber);
 	char* stringNumber = malloc(length + 1);
 	snprintf(stringNumber, length + 1, "%d", randomNumber);
@@ -59,21 +67,27 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 
 static void handleRepeatButton(GtkButton *button, gpointer user_data)
 {
+
+	g_print("pPastNumbers: %p\n", pPastNumbers);
+	pCurrentNumbers = pPastNumbers;
+	g_print("pCurrentNumbers: %p\n", pCurrentNumbers);
+	counter = 0;
 	guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
 
 static void handlePlayButton(GtkButton *button, gpointer user_data)
 {
 	int randomNumber;
-	currentNumbers = (int *) malloc(rows * sizeof(int));
+	pCurrentNumbers = (int *) malloc(rows * sizeof(int));
 	for(int i = 0; i < rows; i++) {
 		randomNumber = getRandomNumber();
-		currentNumbers[i] = randomNumber;
+		pCurrentNumbers[i] = randomNumber;
 	}
 	for(int i = 0; i < rows; i++) {
-		g_print(" %d ", currentNumbers[i]);
+		g_print(" %d ", pCurrentNumbers[i]);
 	}
 	g_print(" \n ");
+	g_print("pCurrentNumbers: %p\n", pCurrentNumbers);
 	
 	counter = 0;
 	gtk_widget_set_sensitive(GTK_WIDGET(user_data), FALSE);
@@ -120,15 +134,14 @@ static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gp
 
 	gtk_spin_button_set_value(digitsSpinButton, digits);
 	gtk_spin_button_set_value(rowsSpinButton, rows);
-
-
 }
 
 static void quitActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
+	free(pPastNumbers);
+	free(pCurrentNumbers);
 	GApplication *app = G_APPLICATION(user_data);
 	g_application_quit(app);
-
 }
 
 static gboolean closeWindow(GtkWindow *window, gpointer user_data)
@@ -161,7 +174,7 @@ static void connectMainWindowSignals(GtkBuilder *build)
 	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), playButton);
 	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), playButton);
 
-	currentNumbers = (int *) malloc(rows * sizeof(int));
+	pCurrentNumbers = (int *) malloc(rows * sizeof(int));
 }
 
 static void createActions(GtkWidget *mainWindow)
