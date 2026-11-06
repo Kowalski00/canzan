@@ -4,6 +4,7 @@
 #include "glibconfig.h"
 #include <gtk/gtk.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "random.h"
 
@@ -14,6 +15,8 @@ static double rows = 2;
 static int *pCurrentNumbers;
 static int *pPastNumbers;
 static int counter = 0;
+
+static mt_state randomState;
 
 static GtkLabel *mainNumberDisplay;
 
@@ -32,16 +35,12 @@ static int getRandomNumber()
 	if(digits == 0) return 0;
 	int max = getPow(digits);
 	int min = getPow(digits - 1);
-	int x = random_uint32();
+	uint32_t x = random_uint32(&randomState);
 	do {
-		x = rand();
+		x = random_uint32(&randomState);
 	} while(x >= (RAND_MAX - RAND_MAX % max));
-	g_print("x: %d\n", x);
 	x %= max;
-	g_print("x: %d\n", x);
-	int randomNumber = min + (rand() % (max - min));
-	g_print("rN: %d\n", randomNumber);
-	return randomNumber;
+	return min + (x % (max - min));
 }
 
 static void copyArray(int *source, int *target, int size)
@@ -239,6 +238,8 @@ static void activate(GtkApplication *app, gpointer user_data)
 
 	g_object_unref(menuBuild);
 	g_object_unref(build);
+
+	initialize_state(&randomState, (uint32_t) time(NULL));
 }
 
 static void startup(GtkApplication *app, gpointer user_data)
@@ -251,7 +252,7 @@ int main(int argc, char **argv)
 	GtkApplication *app;
 	int status;
 
-	app = gtk_application_new("org.rkj.anzan", G_APPLICATION_DEFAULT_FLAGS);
+	app = gtk_application_new("org.rkj.anzan", G_APPLICATION_FLAGS_NONE);
 	g_signal_connect(app, "startup", G_CALLBACK(startup), NULL);
 	g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
 

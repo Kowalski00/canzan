@@ -7,5 +7,5 @@ resources = gnome.compile_resources('canzan', 'data/canzan.gresource.xml', sourc
 
 sourcefiles = files('src/main.c')
 
-executable('canzan', ['src/main.c', resources], dependencies: gtk4, install: false)
+executable('canzan', ['src/main.c', 'src/random.c', resources], dependencies: gtk4, install: false)
 
