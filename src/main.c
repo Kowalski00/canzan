@@ -5,6 +5,8 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>
 
+#include "random.h"
+
 #define APP_PREFIX "/com/github/rkj/canzan/"
 
 static double digits = 1;
@@ -30,7 +32,15 @@ static int getRandomNumber()
 	if(digits == 0) return 0;
 	int max = getPow(digits);
 	int min = getPow(digits - 1);
+	int x = random_uint32();
+	do {
+		x = rand();
+	} while(x >= (RAND_MAX - RAND_MAX % max));
+	g_print("x: %d\n", x);
+	x %= max;
+	g_print("x: %d\n", x);
 	int randomNumber = min + (rand() % (max - min));
+	g_print("rN: %d\n", randomNumber);
 	return randomNumber;
 }
 
