@@ -181,6 +181,8 @@ static void connectMainWindowSignals(GtkBuilder *build)
 		g_printerr("[*] ERROR: Could not find repeat button object inside canzan.ui");
 	}
 
+	gtk_widget_add_css_class(GTK_WIDGET(mainNumberDisplay), "mainLabel");
+
 	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), playButton);
 	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), repeatButton);
 
@@ -204,6 +206,23 @@ static void createAppActions(GtkApplication *app)
 	};
 
 	g_action_map_add_action_entries(G_ACTION_MAP(app), window_entries, G_N_ELEMENTS(window_entries), app);
+}
+static void cssParsingError(GtkCssProvider *provider, GtkCssSection *section, GError *error, gpointer user_data)
+{
+    g_printerr("CSS parsing error: %s\n", error->message);
+}
+
+static void provideCss()
+{
+
+	GdkDisplay *display = gdk_display_get_default();
+	GtkCssProvider *provider = gtk_css_provider_new();
+
+	g_signal_connect(provider, "parsing-error", G_CALLBACK(cssParsingError), NULL);
+
+	gtk_css_provider_load_from_resource(provider, APP_PREFIX"data/styles.css");
+	gtk_style_context_add_provider_for_display(display, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	g_object_unref(provider);
 }
 
 static void activate(GtkApplication *app, gpointer user_data)
@@ -234,6 +253,8 @@ static void activate(GtkApplication *app, gpointer user_data)
 	connectMainWindowSignals(build);
 	
 	createActions(mainWindow);
+
+	provideCss();
 
 	gtk_window_present(GTK_WINDOW(mainWindow));
 
