@@ -1,7 +1,7 @@
 .mainLabel {
-    font-size: 64px;
+    font-size: 256px;
     font-weight: bold;
-    color: #dddddd;
+    color: #000000;
     padding: 30px;
     border-radius: 12px;
 }
