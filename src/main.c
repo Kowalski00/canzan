@@ -81,6 +81,7 @@ static void handleRepeatButton(GtkButton *button, gpointer user_data)
 	pCurrentNumbers = pPastNumbers;
 	g_print("pCurrentNumbers: %p\n", pCurrentNumbers);
 	counter = 0;
+	gtk_widget_set_sensitive(GTK_WIDGET(user_data), FALSE);
 	guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
 
@@ -181,7 +182,7 @@ static void connectMainWindowSignals(GtkBuilder *build)
 	}
 
 	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), playButton);
-	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), playButton);
+	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), repeatButton);
 
 	pCurrentNumbers = (int *) malloc(rows * sizeof(int));
 }
