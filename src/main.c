@@ -15,6 +15,7 @@ static double rows = 2;
 static int *pCurrentNumbers;
 static int *pPastNumbers;
 static int counter = 0;
+static int shouldCleanBetweenNumbers = 0;
 
 static mt_state randomState;
 
@@ -58,10 +59,18 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 		free(pCurrentNumbers);
 		pCurrentNumbers = NULL;
 		counter = 0;
+		shouldCleanBetweenNumbers = 0;
 		gtk_widget_set_sensitive(GTK_WIDGET(user_data), TRUE);
 		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
 		return FALSE;
 	}
+
+	if(shouldCleanBetweenNumbers) {
+		shouldCleanBetweenNumbers = 0;
+		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
+		return TRUE;
+	}
+
 	int randomNumber = pCurrentNumbers[counter];
 	int length = snprintf(NULL, 0, "%d", randomNumber);
 	char* stringNumber = malloc(length + 1);
@@ -71,7 +80,8 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 
 	free(stringNumber);
 	counter++;
-	return true;
+	shouldCleanBetweenNumbers = 1;
+	return TRUE;
 }
 
 static void handleRepeatButton(GtkButton *button, gpointer user_data)
