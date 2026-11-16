@@ -53,6 +53,12 @@ static void copyArray(int *source, int *target, int size)
 
 static gboolean handleSettingNumberLabel(gpointer user_data)
 {
+	if(shouldCleanBetweenNumbers) {
+		shouldCleanBetweenNumbers = 0;
+		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
+		return TRUE;
+	}
+
 	if(counter == rows) {
 		pPastNumbers = (int *) malloc(rows * sizeof(int));
 		copyArray(pCurrentNumbers, pPastNumbers, rows);
@@ -61,14 +67,8 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 		counter = 0;
 		shouldCleanBetweenNumbers = 0;
 		gtk_widget_set_sensitive(GTK_WIDGET(user_data), TRUE);
-		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
+		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "?");
 		return FALSE;
-	}
-
-	if(shouldCleanBetweenNumbers) {
-		shouldCleanBetweenNumbers = 0;
-		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
-		return TRUE;
 	}
 
 	int randomNumber = pCurrentNumbers[counter];
@@ -109,6 +109,8 @@ static void handlePlayButton(GtkButton *button, gpointer user_data)
 	g_print(" \n ");
 	g_print("pCurrentNumbers: %p\n", pCurrentNumbers);
 	
+	gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
+
 	counter = 0;
 	gtk_widget_set_sensitive(GTK_WIDGET(user_data), FALSE);
 	guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
