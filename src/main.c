@@ -16,10 +16,25 @@ static int *pCurrentNumbers;
 static int *pPastNumbers;
 static int counter = 0;
 static int shouldCleanBetweenNumbers = 0;
+static int isGroupGradeSelected = 0;
+static int selectedGroupGradeRow = 0;
 
 static mt_state randomState;
 
 static GtkLabel *mainNumberDisplay;
+
+static int groupASixthGradeGrid[10][15] = {
+	{528,160,427,951,719,452,106,843,385,690,724,381,203,579,634}
+	, {967,239,650,108,243,758,491,536,702,871,460,629,984,315,870}
+	, {482,251,147,598,120,-643,-839,304,987,439,-671,-305,-526,760,215}
+    , {106, 543, 928, 710, 954, 329, 267, 695, 514, 870, 308, 796, 632, 807, 481}
+    , {815, 302, 491, 852, -169, -401, -958, 576, 740, 183, -235, -673, 340, 927, 264}
+    , {360, 829, 213, 308, 497, 932, 589, 690, 147, 674, 850, 201, 765, 148, 756}
+    , {769, 420, 195, -513, -854, 508, 274, 421, 963, -307, -631, -175, 286, 840, 392}
+    , {241, 952, 309, 756, 487, 360, 617, 508, 873, 420, 196, 689, 204, 795, 138}
+    , {654, 516, 740, 495, 536, -785, -320, -197, 201, 873, 124, -482, -968, 319, 203}
+    , {185, 730, 698, 246, 809, 953, 721, 370, 617, 164, 902, 596, 480, 342, 875}
+};
 
 static int getPow(double digits)
 {
@@ -59,7 +74,14 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 		return TRUE;
 	}
 
-	if(counter == rows) {
+	int rowsToPlay;
+	if(isGroupGradeSelected) {
+		rowsToPlay = 15;
+	} else {
+		rowsToPlay = rows;
+	}
+
+	if(counter == rowsToPlay) {
 		pPastNumbers = (int *) malloc(rows * sizeof(int));
 		copyArray(pCurrentNumbers, pPastNumbers, rows);
 		free(pCurrentNumbers);
@@ -97,17 +119,20 @@ static void handleRepeatButton(GtkButton *button, gpointer user_data)
 
 static void handlePlayButton(GtkButton *button, gpointer user_data)
 {
-	int randomNumber;
-	pCurrentNumbers = (int *) malloc(rows * sizeof(int));
-	for(int i = 0; i < rows; i++) {
-		randomNumber = getRandomNumber();
-		pCurrentNumbers[i] = randomNumber;
+	int rowsToPlay;
+	if(isGroupGradeSelected) {
+		rowsToPlay = 15;	
+	} else {
+		rowsToPlay = rows;
 	}
-	for(int i = 0; i < rows; i++) {
-		g_print(" %d ", pCurrentNumbers[i]);
+	pCurrentNumbers = (int *) malloc(rowsToPlay * sizeof(int));
+	for(int i = 0; i < rowsToPlay; i++) {
+		if(isGroupGradeSelected) {
+			pCurrentNumbers[i] = groupASixthGradeGrid[selectedGroupGradeRow][i];
+		} else {
+			pCurrentNumbers[i] = getRandomNumber();
+		}
 	}
-	g_print(" \n ");
-	g_print("pCurrentNumbers: %p\n", pCurrentNumbers);
 	
 	gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
 
@@ -126,6 +151,13 @@ static void handleRowsSpinButton(GtkSpinButton *button, gpointer user_data)
 	rows = gtk_spin_button_get_value_as_int(button);
 }
 
+static void handleSelectRowFromGroupGradeButton(GtkButton *pButton, gpointer user_data)
+{
+	int row = GPOINTER_TO_INT(user_data);
+	isGroupGradeSelected = 1;
+	selectedGroupGradeRow = row;
+}
+
 static void openExercisesActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/exercises.ui");
@@ -135,45 +167,46 @@ static void openExercisesActivated(GSimpleAction *action, GVariant *parameter, g
 
 	GtkGrid *grid = GTK_GRID(gtk_builder_get_object(build, "exerciseGrid"));
 
-	int groupASixthGradeGrid[2][15] = {
-		{528,160,427,951,719,452,106,843,385,690,724,381,203,579,634}
-		, {967,239,650,108,243,758,491,536,702,871,460,629,984,315,870}
-	};
-
-	for(int j = 0; j < 2; j++) {
+	for(int j = 0; j < 10; j++) {
 
 		int headerNumberLength = snprintf(NULL, 0, "%d", j + 1) + 1;
-		char* headerNumber = malloc(headerNumberLength + 1);
-		snprintf(headerNumber, headerNumberLength, "%d", j + 1);
+		char* pHeaderNumber = malloc(headerNumberLength + 1);
+		snprintf(pHeaderNumber, headerNumberLength, "%d", j + 1);
 
-		char* headerNumberStylized = malloc(headerNumberLength + 3);
-		snprintf(headerNumberStylized, headerNumberLength + 3, "%s%s%s", "(", headerNumber, ")");
+		char* pHeaderNumberStylized = malloc(headerNumberLength + 3);
+		snprintf(pHeaderNumberStylized, headerNumberLength + 3, "%s%s%s", "(", pHeaderNumber, ")");
 
-		GtkLabel *label = GTK_LABEL(gtk_label_new(headerNumberStylized));
+		GtkLabel *label = GTK_LABEL(gtk_label_new(pHeaderNumberStylized));
 		gtk_grid_attach(grid, GTK_WIDGET(label), j, 0, 1, 1);
 
-		free(headerNumber);
-		free(headerNumberStylized);
+		free(pHeaderNumber);
+		free(pHeaderNumberStylized);
 
 		for(int i = 0; i < 15; i++) {
 
-			char* stringNumber = "";
+			char* pStringNumber = "";
 			int length = snprintf(NULL, 0, "%d", groupASixthGradeGrid[j][i]);
-			stringNumber = malloc(length + 1);
-			snprintf(stringNumber, length + 1, "%d", groupASixthGradeGrid[j][i]);
+			pStringNumber = malloc(length + 1);
+			snprintf(pStringNumber, length + 1, "%d", groupASixthGradeGrid[j][i]);
 
-			GtkLabel *label = GTK_LABEL(gtk_label_new(stringNumber));
+			GtkLabel *label = GTK_LABEL(gtk_label_new(pStringNumber));
 
 			gtk_grid_attach(grid, GTK_WIDGET(label), j, i + 1, 1, 1);
-			free(stringNumber);
+			free(pStringNumber);
 		}
 	}
+
+	for(int i = 0; i < 10; i++) {
+		GtkButton *pButton = GTK_BUTTON(gtk_button_new_with_label("Select"));
+		gtk_grid_attach(grid, GTK_WIDGET(pButton), i, 17, 1, 1);
+		g_signal_connect(pButton, "clicked", G_CALLBACK(handleSelectRowFromGroupGradeButton), GINT_TO_POINTER(i));
+	}
+	
+	gtk_grid_set_column_spacing(grid, 30);
 
 	gtk_window_set_application(GTK_WINDOW(exercisesWindow), GTK_APPLICATION(app));
 
 	gtk_window_present(GTK_WINDOW(exercisesWindow));
-
-
 }
 
 static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)

@@ -27,7 +27,10 @@
 						</child>
 						<child>
 							<object class="GtkGrid" id="exerciseGrid">
-								
+								<property name="hexpand">1</property>
+								<property name="vexpand">1</property>
+								<property name="halign">GTK_ALIGN_CENTER</property>
+								<property name="valign">GTK_ALIGN_CENTER</property>
 							</object>
 						</child>
 					</object>
