@@ -36,6 +36,11 @@ static int groupASixthGradeGrid[10][15] = {
     , {185, 730, 698, 246, 809, 953, 721, 370, 617, 164, 902, 596, 480, 342, 875}
 };
 
+typedef struct {
+	GtkButton *pPlayButton;
+	GtkButton *pRepeatButton;
+} ButtonsPointers;
+
 static int getPow(double digits)
 {
 	int result = 1;
@@ -68,6 +73,8 @@ static void copyArray(int *source, int *target, int size)
 
 static gboolean handleSettingNumberLabel(gpointer user_data)
 {
+	ButtonsPointers *pPointers = (ButtonsPointers *)user_data;
+
 	if(shouldCleanBetweenNumbers) {
 		shouldCleanBetweenNumbers = 0;
 		gtk_label_set_label(GTK_LABEL(pMainNumberDisplay), "");
@@ -88,7 +95,8 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 		pCurrentNumbers = NULL;
 		counter = 0;
 		shouldCleanBetweenNumbers = 0;
-		gtk_widget_set_sensitive(GTK_WIDGET(user_data), TRUE);
+		gtk_widget_set_sensitive(GTK_WIDGET(pPointers->pPlayButton), TRUE);
+		gtk_widget_set_sensitive(GTK_WIDGET(pPointers->pRepeatButton), TRUE);
 		gtk_label_set_label(GTK_LABEL(pMainNumberDisplay), "?");
 		return FALSE;
 	}
@@ -108,12 +116,11 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 
 static void handleRepeatButton(GtkButton *button, gpointer user_data)
 {
-
-	g_print("pPastNumbers: %p\n", pPastNumbers);
+	ButtonsPointers *pPointers = (ButtonsPointers *)user_data;
 	pCurrentNumbers = pPastNumbers;
-	g_print("pCurrentNumbers: %p\n", pCurrentNumbers);
 	counter = 0;
-	gtk_widget_set_sensitive(GTK_WIDGET(user_data), FALSE);
+	gtk_label_set_label(GTK_LABEL(pMainNumberDisplay), "");
+	gtk_widget_set_sensitive(GTK_WIDGET(pPointers->pRepeatButton), FALSE);
 	//guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
 	g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
@@ -137,8 +144,10 @@ static void handlePlayButton(GtkButton *button, gpointer user_data)
 	
 	gtk_label_set_label(GTK_LABEL(pMainNumberDisplay), "");
 
+	ButtonsPointers *pPointers = (ButtonsPointers *)user_data;
+
 	counter = 0;
-	gtk_widget_set_sensitive(GTK_WIDGET(user_data), FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(pPointers->pPlayButton), FALSE);
 	//guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
 	g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
@@ -280,8 +289,14 @@ static void connectMainWindowSignals(GtkBuilder *build)
 
 	gtk_widget_add_css_class(GTK_WIDGET(pMainNumberDisplay), "mainLabel");
 
-	g_signal_connect(pPlayButton, "clicked", G_CALLBACK(handlePlayButton), pPlayButton);
-	g_signal_connect(pRepeatButton, "clicked", G_CALLBACK(handleRepeatButton), pRepeatButton);
+	ButtonsPointers *pPointers = g_new(ButtonsPointers, 1);
+	pPointers->pPlayButton = pPlayButton;
+	pPointers->pRepeatButton = pRepeatButton;
+
+	g_signal_connect(pPlayButton, "clicked", G_CALLBACK(handlePlayButton), pPointers);
+	g_signal_connect(pRepeatButton, "clicked", G_CALLBACK(handleRepeatButton), pPointers);
+
+	gtk_widget_set_sensitive(GTK_WIDGET(pRepeatButton), FALSE);
 
 	pCurrentNumbers = (int *) malloc(rows * sizeof(int));
 }
