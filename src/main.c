@@ -21,7 +21,7 @@ static int selectedGroupGradeRow = 0;
 
 static mt_state randomState;
 
-static GtkLabel *mainNumberDisplay;
+static GtkLabel *pMainNumberDisplay;
 
 static int groupASixthGradeGrid[10][15] = {
 	{528,160,427,951,719,452,106,843,385,690,724,381,203,579,634}
@@ -70,7 +70,7 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 {
 	if(shouldCleanBetweenNumbers) {
 		shouldCleanBetweenNumbers = 0;
-		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
+		gtk_label_set_label(GTK_LABEL(pMainNumberDisplay), "");
 		return TRUE;
 	}
 
@@ -89,18 +89,18 @@ static gboolean handleSettingNumberLabel(gpointer user_data)
 		counter = 0;
 		shouldCleanBetweenNumbers = 0;
 		gtk_widget_set_sensitive(GTK_WIDGET(user_data), TRUE);
-		gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "?");
+		gtk_label_set_label(GTK_LABEL(pMainNumberDisplay), "?");
 		return FALSE;
 	}
 
 	int randomNumber = pCurrentNumbers[counter];
 	int length = snprintf(NULL, 0, "%d", randomNumber);
-	char* stringNumber = malloc(length + 1);
-	snprintf(stringNumber, length + 1, "%d", randomNumber);
+	char* pStringNumber = malloc(length + 1);
+	snprintf(pStringNumber, length + 1, "%d", randomNumber);
 
-	gtk_label_set_label(GTK_LABEL(mainNumberDisplay), stringNumber);
+	gtk_label_set_label(GTK_LABEL(pMainNumberDisplay), pStringNumber);
 
-	free(stringNumber);
+	free(pStringNumber);
 	counter++;
 	shouldCleanBetweenNumbers = 1;
 	return TRUE;
@@ -114,7 +114,8 @@ static void handleRepeatButton(GtkButton *button, gpointer user_data)
 	g_print("pCurrentNumbers: %p\n", pCurrentNumbers);
 	counter = 0;
 	gtk_widget_set_sensitive(GTK_WIDGET(user_data), FALSE);
-	guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
+	//guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
+	g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
 
 static void handlePlayButton(GtkButton *button, gpointer user_data)
@@ -134,11 +135,12 @@ static void handlePlayButton(GtkButton *button, gpointer user_data)
 		}
 	}
 	
-	gtk_label_set_label(GTK_LABEL(mainNumberDisplay), "");
+	gtk_label_set_label(GTK_LABEL(pMainNumberDisplay), "");
 
 	counter = 0;
 	gtk_widget_set_sensitive(GTK_WIDGET(user_data), FALSE);
-	guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
+	//guint id = g_timeout_add(1000, handleSettingNumberLabel, user_data);
+	g_timeout_add(1000, handleSettingNumberLabel, user_data);
 }
 
 static void handleDigitsSpinButton(GtkSpinButton *button, gpointer user_data)
@@ -160,12 +162,12 @@ static void handleSelectRowFromGroupGradeButton(GtkButton *pButton, gpointer use
 
 static void openExercisesActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/exercises.ui");
-	GtkWidget *exercisesWindow = GTK_WIDGET(gtk_builder_get_object(build, "exercisesWindow"));
+	GtkBuilder *pBuild = gtk_builder_new_from_resource(APP_PREFIX"data/exercises.ui");
+	GtkWidget *pExercisesWindow = GTK_WIDGET(gtk_builder_get_object(pBuild, "exercisesWindow"));
 
-	GtkApplication *app = gtk_window_get_application(GTK_WINDOW(user_data));
+	GtkApplication *pApp = gtk_window_get_application(GTK_WINDOW(user_data));
 
-	GtkGrid *grid = GTK_GRID(gtk_builder_get_object(build, "exerciseGrid"));
+	GtkGrid *pGrid = GTK_GRID(gtk_builder_get_object(pBuild, "exerciseGrid"));
 
 	for(int j = 0; j < 10; j++) {
 
@@ -177,7 +179,7 @@ static void openExercisesActivated(GSimpleAction *action, GVariant *parameter, g
 		snprintf(pHeaderNumberStylized, headerNumberLength + 3, "%s%s%s", "(", pHeaderNumber, ")");
 
 		GtkLabel *label = GTK_LABEL(gtk_label_new(pHeaderNumberStylized));
-		gtk_grid_attach(grid, GTK_WIDGET(label), j, 0, 1, 1);
+		gtk_grid_attach(pGrid, GTK_WIDGET(label), j, 0, 1, 1);
 
 		free(pHeaderNumber);
 		free(pHeaderNumberStylized);
@@ -191,62 +193,62 @@ static void openExercisesActivated(GSimpleAction *action, GVariant *parameter, g
 
 			GtkLabel *label = GTK_LABEL(gtk_label_new(pStringNumber));
 
-			gtk_grid_attach(grid, GTK_WIDGET(label), j, i + 1, 1, 1);
+			gtk_grid_attach(pGrid, GTK_WIDGET(label), j, i + 1, 1, 1);
 			free(pStringNumber);
 		}
 	}
 
 	for(int i = 0; i < 10; i++) {
 		GtkButton *pButton = GTK_BUTTON(gtk_button_new_with_label("Select"));
-		gtk_grid_attach(grid, GTK_WIDGET(pButton), i, 17, 1, 1);
+		gtk_grid_attach(pGrid, GTK_WIDGET(pButton), i, 17, 1, 1);
 		g_signal_connect(pButton, "clicked", G_CALLBACK(handleSelectRowFromGroupGradeButton), GINT_TO_POINTER(i));
 	}
 	
-	gtk_grid_set_column_spacing(grid, 30);
+	gtk_grid_set_column_spacing(pGrid, 30);
 
-	gtk_window_set_application(GTK_WINDOW(exercisesWindow), GTK_APPLICATION(app));
+	gtk_window_set_application(GTK_WINDOW(pExercisesWindow), GTK_APPLICATION(pApp));
 
-	gtk_window_present(GTK_WINDOW(exercisesWindow));
+	gtk_window_present(GTK_WINDOW(pExercisesWindow));
 }
 
 static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/history.ui");
-	GtkWidget *historyWindow = GTK_WIDGET(gtk_builder_get_object(build, "historyWindow"));
+	GtkBuilder *pBuild = gtk_builder_new_from_resource(APP_PREFIX"data/history.ui");
+	GtkWidget *pHistoryWindow = GTK_WIDGET(gtk_builder_get_object(pBuild, "historyWindow"));
 
-	GtkApplication *app = gtk_window_get_application(GTK_WINDOW(user_data));
+	GtkApplication *pApp = gtk_window_get_application(GTK_WINDOW(user_data));
 
-	gtk_window_set_application(GTK_WINDOW(historyWindow), GTK_APPLICATION(app));
+	gtk_window_set_application(GTK_WINDOW(pHistoryWindow), GTK_APPLICATION(pApp));
 
-	gtk_window_present(GTK_WINDOW(historyWindow));
+	gtk_window_present(GTK_WINDOW(pHistoryWindow));
 }
 
 static void openSettingsActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
-	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/settings.ui");
-	GtkSpinButton *digitsSpinButton = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "digitsSpinButton"));
-	GtkSpinButton *rowsSpinButton = GTK_SPIN_BUTTON(gtk_builder_get_object(build, "rowsSpinButton"));
-	GtkWidget *settingsWindow = GTK_WIDGET(gtk_builder_get_object(build, "settingsWindow"));
+	GtkBuilder *pBuild = gtk_builder_new_from_resource(APP_PREFIX"data/settings.ui");
+	GtkSpinButton *pDigitsSpinButton = GTK_SPIN_BUTTON(gtk_builder_get_object(pBuild, "digitsSpinButton"));
+	GtkSpinButton *pRowsSpinButton = GTK_SPIN_BUTTON(gtk_builder_get_object(pBuild, "rowsSpinButton"));
+	GtkWidget *pSettingsWindow = GTK_WIDGET(gtk_builder_get_object(pBuild, "settingsWindow"));
 
-	GtkApplication *app = gtk_window_get_application(GTK_WINDOW(user_data));
+	GtkApplication *pApp = gtk_window_get_application(GTK_WINDOW(user_data));
 
-	gtk_window_set_application(GTK_WINDOW(settingsWindow), GTK_APPLICATION(app));
+	gtk_window_set_application(GTK_WINDOW(pSettingsWindow), GTK_APPLICATION(pApp));
 
-	gtk_window_present(GTK_WINDOW(settingsWindow));
+	gtk_window_present(GTK_WINDOW(pSettingsWindow));
 
-	g_signal_connect(digitsSpinButton, "value-changed", G_CALLBACK(handleDigitsSpinButton), NULL);
-	g_signal_connect(rowsSpinButton, "value-changed", G_CALLBACK(handleRowsSpinButton), NULL);
+	g_signal_connect(pDigitsSpinButton, "value-changed", G_CALLBACK(handleDigitsSpinButton), NULL);
+	g_signal_connect(pRowsSpinButton, "value-changed", G_CALLBACK(handleRowsSpinButton), NULL);
 
-	gtk_spin_button_set_value(digitsSpinButton, digits);
-	gtk_spin_button_set_value(rowsSpinButton, rows);
+	gtk_spin_button_set_value(pDigitsSpinButton, digits);
+	gtk_spin_button_set_value(pRowsSpinButton, rows);
 }
 
 static void quitActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	free(pPastNumbers);
 	free(pCurrentNumbers);
-	GApplication *app = G_APPLICATION(user_data);
-	g_application_quit(app);
+	GApplication *pApp = G_APPLICATION(user_data);
+	g_application_quit(pApp);
 }
 
 static gboolean closeWindow(GtkWindow *window, gpointer user_data)
@@ -257,29 +259,29 @@ static gboolean closeWindow(GtkWindow *window, gpointer user_data)
 
 static void connectMainWindowSignals(GtkBuilder *build)
 {
-	GtkButton *playButton;
-	GtkButton *repeatButton;
+	GtkButton *pPlayButton;
+	GtkButton *pRepeatButton;
 
-	playButton = GTK_BUTTON(gtk_builder_get_object(build, "playButton"));
-	repeatButton = GTK_BUTTON(gtk_builder_get_object(build, "repeatButton"));
-	mainNumberDisplay = GTK_LABEL(gtk_builder_get_object(build, "mainDisplayNumbers"));
+	pPlayButton = GTK_BUTTON(gtk_builder_get_object(build, "playButton"));
+	pRepeatButton = GTK_BUTTON(gtk_builder_get_object(build, "repeatButton"));
+	pMainNumberDisplay = GTK_LABEL(gtk_builder_get_object(build, "mainDisplayNumbers"));
 
-	if(playButton == NULL) {
+	if(pPlayButton == NULL) {
 		g_printerr("[*] ERROR: Could not find play button object inside canzan.ui");
 	}
 	
-	if(repeatButton == NULL) {
+	if(pRepeatButton == NULL) {
 		g_printerr("[*] ERROR: Could not find repeat button object inside canzan.ui");
 	}
 
-	if(mainNumberDisplay == NULL) {
-		g_printerr("[*] ERROR: Could not find repeat button object inside canzan.ui");
+	if(pMainNumberDisplay == NULL) {
+		g_printerr("[*] ERROR: Could not find main number display object inside canzan.ui");
 	}
 
-	gtk_widget_add_css_class(GTK_WIDGET(mainNumberDisplay), "mainLabel");
+	gtk_widget_add_css_class(GTK_WIDGET(pMainNumberDisplay), "mainLabel");
 
-	g_signal_connect(playButton, "clicked", G_CALLBACK(handlePlayButton), playButton);
-	g_signal_connect(repeatButton, "clicked", G_CALLBACK(handleRepeatButton), repeatButton);
+	g_signal_connect(pPlayButton, "clicked", G_CALLBACK(handlePlayButton), pPlayButton);
+	g_signal_connect(pRepeatButton, "clicked", G_CALLBACK(handleRepeatButton), pRepeatButton);
 
 	pCurrentNumbers = (int *) malloc(rows * sizeof(int));
 }
@@ -311,51 +313,51 @@ static void cssParsingError(GtkCssProvider *provider, GtkCssSection *section, GE
 static void provideCss()
 {
 
-	GdkDisplay *display = gdk_display_get_default();
-	GtkCssProvider *provider = gtk_css_provider_new();
+	GdkDisplay *pDisplay = gdk_display_get_default();
+	GtkCssProvider *pProvider = gtk_css_provider_new();
 
-	g_signal_connect(provider, "parsing-error", G_CALLBACK(cssParsingError), NULL);
+	g_signal_connect(pProvider, "parsing-error", G_CALLBACK(cssParsingError), NULL);
 
-	gtk_css_provider_load_from_resource(provider, APP_PREFIX"data/styles.css");
-	gtk_style_context_add_provider_for_display(display, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-	g_object_unref(provider);
+	gtk_css_provider_load_from_resource(pProvider, APP_PREFIX"data/styles.css");
+	gtk_style_context_add_provider_for_display(pDisplay, GTK_STYLE_PROVIDER(pProvider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	g_object_unref(pProvider);
 }
 
 static void activate(GtkApplication *app, gpointer user_data)
 {
-	GtkBuilder *build;
-	GtkBuilder *menuBuild;
-	GtkWidget *mainWindow;
-	GMenuModel *menu;
-	GtkWidget *menuBar;
+	GtkBuilder *pBuild;
+	GtkBuilder *pMenuBuild;
+	GtkWidget *pMainWindow;
+	GMenuModel *pMenu;
+	GtkWidget *pMenuBar;
 
-	build = gtk_builder_new_from_resource(APP_PREFIX"data/canzan.ui");
-	mainWindow = GTK_WIDGET(gtk_builder_get_object(build, "window"));
+	pBuild = gtk_builder_new_from_resource(APP_PREFIX"data/canzan.ui");
+	pMainWindow = GTK_WIDGET(gtk_builder_get_object(pBuild, "window"));
 
-	g_signal_connect(mainWindow, "close-request", G_CALLBACK(closeWindow), app);
-	gtk_window_set_application(GTK_WINDOW(mainWindow), GTK_APPLICATION(app));
+	g_signal_connect(pMainWindow, "close-request", G_CALLBACK(closeWindow), app);
+	gtk_window_set_application(GTK_WINDOW(pMainWindow), GTK_APPLICATION(app));
 
-	menuBuild = gtk_builder_new_from_resource(APP_PREFIX"data/menu.ui");
+	pMenuBuild = gtk_builder_new_from_resource(APP_PREFIX"data/menu.ui");
 
-	menu = G_MENU_MODEL(gtk_builder_get_object(menuBuild, "menu"));
-	menuBar = GTK_WIDGET(gtk_builder_get_object(build, "menuBar"));
+	pMenu = G_MENU_MODEL(gtk_builder_get_object(pMenuBuild, "menu"));
+	pMenuBar = GTK_WIDGET(gtk_builder_get_object(pBuild, "menuBar"));
 
-	if(menu != NULL && menuBar != NULL) {
-		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(menuBar), menu);
+	if(pMenu != NULL && pMenuBar != NULL) {
+		gtk_popover_menu_bar_set_menu_model(GTK_POPOVER_MENU_BAR(pMenuBar), pMenu);
 	} else {
 		g_printerr("[*] ERROR: Could not find menu object inside menu.ui");
 	}
 
-	connectMainWindowSignals(build);
+	connectMainWindowSignals(pBuild);
 	
-	createActions(mainWindow);
+	createActions(pMainWindow);
 
 	provideCss();
 
-	gtk_window_present(GTK_WINDOW(mainWindow));
+	gtk_window_present(GTK_WINDOW(pMainWindow));
 
-	g_object_unref(menuBuild);
-	g_object_unref(build);
+	g_object_unref(pMenuBuild);
+	g_object_unref(pBuild);
 
 	initialize_state(&randomState, (uint32_t) time(NULL));
 }
@@ -367,16 +369,16 @@ static void startup(GtkApplication *app, gpointer user_data)
 
 int main(int argc, char **argv)
 {
-	GtkApplication *app;
+	GtkApplication *pApp;
 	int status;
 
-	app = gtk_application_new("org.rkj.anzan", G_APPLICATION_FLAGS_NONE);
-	g_signal_connect(app, "startup", G_CALLBACK(startup), NULL);
-	g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+	pApp = gtk_application_new("org.rkj.anzan", G_APPLICATION_FLAGS_NONE);
+	g_signal_connect(pApp, "startup", G_CALLBACK(startup), NULL);
+	g_signal_connect(pApp, "activate", G_CALLBACK(activate), NULL);
 
-	status = g_application_run(G_APPLICATION(app), argc, argv);
+	status = g_application_run(G_APPLICATION(pApp), argc, argv);
 
-	g_object_unref(app);
+	g_object_unref(pApp);
 
 	return status;
 }
