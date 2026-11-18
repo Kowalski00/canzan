@@ -13,6 +13,10 @@
 					<attribute name="action">win.openSettings</attribute>
 				</item>
 				<item>
+					<attribute name="label">Kojima Exercises</attribute>
+					<attribute name="action">win.openExercises</attribute>
+				</item>
+				<item>
 					<attribute name="label">Quit</attribute>
 					<attribute name="action">app.quit</attribute>
 				</item>

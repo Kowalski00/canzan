@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+	<object class="GtkApplicationWindow" id="exercisesWindow">
+		<property name="title">Kojima Exercises</property>
+		<property name="default-width">640</property>
+		<property name="default-height">480</property>
+		<child>
+			<object class="GtkBox">
+				<property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+				<child>
+					<object class="GtkBox" id="exercisesWindowBox">
+						<property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+						<child>
+							<object class="GtkLabel">
+								<property name="label">Sixth Grade</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkLabel">
+								<property name="label">Group A</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkLabel">
+								<property name="label">(1 set per minute, or entire group with 70% accuracy in 10 minutes)</property>
+							</object>
+						</child>
+						<child>
+							<object class="GtkGrid" id="exerciseGrid">
+								
+							</object>
+						</child>
+					</object>
+				</child>
+			</object>
+		</child>
+	</object>
+</interface>

@@ -5,6 +5,7 @@
 		<file alias="menu.ui">menu.ui</file>
 		<file alias="settings.ui">settings.ui</file>
 		<file alias="history.ui">history.ui</file>
+		<file alias="exercises.ui">exercises.ui</file>
 		<file alias="styles.css">styles.css</file>
   </gresource>
 </gresources>

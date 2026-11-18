@@ -126,6 +126,56 @@ static void handleRowsSpinButton(GtkSpinButton *button, gpointer user_data)
 	rows = gtk_spin_button_get_value_as_int(button);
 }
 
+static void openExercisesActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
+{
+	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/exercises.ui");
+	GtkWidget *exercisesWindow = GTK_WIDGET(gtk_builder_get_object(build, "exercisesWindow"));
+
+	GtkApplication *app = gtk_window_get_application(GTK_WINDOW(user_data));
+
+	GtkGrid *grid = GTK_GRID(gtk_builder_get_object(build, "exerciseGrid"));
+
+	int first[2][15] = {
+		{528,160,427,951,719,452,106,843,385,690,724,381,203,579,634}
+		, {967,239,650,108,243,758,491,536,702,871,460,629,984,315,870}
+	};
+
+	for(int j = 0; j < 2; j++) {
+
+		int headerNumberLength = snprintf(NULL, 0, "%d", j + 1) + 1;
+		char* headerNumber = malloc(headerNumberLength + 1);
+		snprintf(headerNumber, headerNumberLength, "%d", j + 1);
+
+		char* headerNumberStylized = malloc(headerNumberLength + 3);
+		snprintf(headerNumberStylized, headerNumberLength + 3, "%s%s%s", "(", headerNumber, ")");
+
+		GtkLabel *label = GTK_LABEL(gtk_label_new(headerNumberStylized));
+		gtk_grid_attach(grid, GTK_WIDGET(label), j, 0, 1, 1);
+
+		free(headerNumber);
+		free(headerNumberStylized);
+
+		for(int i = 0; i < 15; i++) {
+
+			char* stringNumber = "";
+			int length = snprintf(NULL, 0, "%d", first[j][i]);
+			stringNumber = malloc(length + 1);
+			snprintf(stringNumber, length + 1, "%d", first[j][i]);
+
+			GtkLabel *label = GTK_LABEL(gtk_label_new(stringNumber));
+
+			gtk_grid_attach(grid, GTK_WIDGET(label), j, i + 1, 1, 1);
+			free(stringNumber);
+		}
+	}
+
+	gtk_window_set_application(GTK_WINDOW(exercisesWindow), GTK_APPLICATION(app));
+
+	gtk_window_present(GTK_WINDOW(exercisesWindow));
+
+
+}
+
 static void openHistoryActivated(GSimpleAction *action, GVariant *parameter, gpointer user_data)
 {
 	GtkBuilder *build = gtk_builder_new_from_resource(APP_PREFIX"data/history.ui");
@@ -205,7 +255,8 @@ static void createActions(GtkWidget *mainWindow)
 {
 	const GActionEntry window_entries[] = {
 		{ "openHistory", openHistoryActivated, NULL, NULL, NULL, {0,0,0}}	
-		, { "openSettings", openSettingsActivated, NULL, NULL, NULL, {0,0,0}}	
+		, { "openSettings", openSettingsActivated, NULL, NULL, NULL, {0,0,0}}
+		, { "openExercises", openExercisesActivated, NULL, NULL, NULL, {0,0,0}}
 	};
 
 	g_action_map_add_action_entries(G_ACTION_MAP(mainWindow), window_entries, G_N_ELEMENTS(window_entries), mainWindow);
