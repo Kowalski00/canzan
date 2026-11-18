@@ -135,7 +135,7 @@ static void openExercisesActivated(GSimpleAction *action, GVariant *parameter, g
 
 	GtkGrid *grid = GTK_GRID(gtk_builder_get_object(build, "exerciseGrid"));
 
-	int first[2][15] = {
+	int groupASixthGradeGrid[2][15] = {
 		{528,160,427,951,719,452,106,843,385,690,724,381,203,579,634}
 		, {967,239,650,108,243,758,491,536,702,871,460,629,984,315,870}
 	};
@@ -158,9 +158,9 @@ static void openExercisesActivated(GSimpleAction *action, GVariant *parameter, g
 		for(int i = 0; i < 15; i++) {
 
 			char* stringNumber = "";
-			int length = snprintf(NULL, 0, "%d", first[j][i]);
+			int length = snprintf(NULL, 0, "%d", groupASixthGradeGrid[j][i]);
 			stringNumber = malloc(length + 1);
-			snprintf(stringNumber, length + 1, "%d", first[j][i]);
+			snprintf(stringNumber, length + 1, "%d", groupASixthGradeGrid[j][i]);
 
 			GtkLabel *label = GTK_LABEL(gtk_label_new(stringNumber));
 
